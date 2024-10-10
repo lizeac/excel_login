@@ -30,9 +30,9 @@ def check_mat(n_matricula):
 
 
 
-n_matricula = '224119294'
+# n_matricula = '224119294'
 
-print(check_mat("224119294"))
+# print(check_mat("224119294"))
 # is_valid = False
 # for item in c:
 #     print(item)

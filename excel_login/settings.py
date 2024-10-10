@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-63o4*evf1r3h-f5l!jqa1z$bbkp@x5x_68nk7)^42)r*a!&n#!'
+# SECRET_KEY = 'django-insecure-63o4*evf1r3h-f5l!jqa1z$bbkp@x5x_68nk7)^42)r*a!&n#!'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',  '63o4*evf1r3h-f5l!jqa1z$bbkp@x5x_68nk7)^42)r*a!&n#!'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+SECURE_HSTS_PRELOAD  = True
 
 # Application definition
 
@@ -124,3 +133,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_SECONDS = 3600
