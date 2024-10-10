@@ -4,7 +4,32 @@ from openpyxl import Workbook, load_workbook
 from datetime import datetime
 import os
 from validate_docbr import CPF
-from home.mat_validator import check_mat
+
+arquivo = r'E:\Lízea Stuff\excel_login\matricula_alunos.xlsx'
+
+wb = load_workbook(arquivo)
+ws = wb['Alunos']
+
+
+c = []
+for r in ws:
+    for w in r:
+        c.append(w.value)
+
+
+
+def check_mat(n_matricula):
+    is_valid = False
+    for item in c:
+        if n_matricula in item:
+            is_valid = True
+            print('Encontrou a matricula')
+            return is_valid
+    return is_valid
+
+
+
+
 # Definir o arquivo Excel que será manipulado
 month_names = month_name = {
             '1': 'Janeiro',
