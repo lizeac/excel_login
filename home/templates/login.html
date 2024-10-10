@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="icon" href="{% static 'icone.png' %}" type="image/x-icon">
     <script>
         function toggleCpfField(checkbox) {
             const cpfField = document.getElementById('cpfField');
@@ -44,9 +45,9 @@
             <label for="servico">Serviço que vai utilizar:</label>
             <select id="servico" name="servico" required>
                 <option value="">Selecione um serviço</option>
-                <option value="circulacao">Pesquisa/Base de Dados</option>
+                <option value="pesquisa">Pesquisa/Base de Dados</option>
                 <option value="circulacao">Circulação(Empréstimo/Devolução)</option>
-                <option value="Consulta">Consulta</option>
+                <option value="consulta">Consulta</option>
                 <option value="referencia">Referência</option>
                 <option value="computadores">Computadores</option>
             </select>
