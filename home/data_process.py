@@ -10,12 +10,7 @@ year = dates.strftime('%Y')
 month = dates.strftime('%m')
 user_access_date = dates.strftime('%d/%m/%Y')
 user_access_hour = dates.strftime('%H:%M')
-file_to_handle = f'users_{year}.xlsx'
 
-
-
-wb = load_workbook(file_to_handle)
-ws = wb.active  
 month_name = {
             '1': 'Janeiro',
             '2': 'Fevereiro',
@@ -31,7 +26,15 @@ month_name = {
             '12': 'Dezembro'        
         }
 
+
 file_month = f'{month_name[str(int(month))]}'
+file_to_handle = f'{file_month}_{year}.xlsx'
+
+
+
+wb = load_workbook(file_to_handle)
+ws = wb.active  
+
 
 # primeira tentativa da função
 
