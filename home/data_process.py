@@ -2,7 +2,6 @@ from openpyxl import load_workbook, Workbook
 from datetime import datetime
 from collections import Counter
 from docx import Document
-from win32com import client
 
 
 dates = datetime.now()
@@ -138,13 +137,3 @@ documento.save(f'Relatorio_{month_name[str(int(month))]}.docx')
 
 
 # Transformar o arquivo word em Excel
-wdFormatPDF = 17
-
-entrada = f'excel_login/Relatorio_{month_name[str(int(month))]}.docx'
-saida = f'excel_login/Relatorio_{month_name[str(int(month))]}.pdf'
-
-word = client.Dispatch('Word.Application')
-doc = word.Documents.Open(entrada)
-doc.SaveAs(saida, FileFormat=wdFormatPDF)
-doc.Close()
-word.Quit()
