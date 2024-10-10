@@ -1,0 +1,95 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-image: url('background_image1.jpeg');
+    background-size: cover;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label, input, select {
+    color: rgb(5, 8, 57);
+    display: block;
+    width: 98%;
+    margin-bottom: 15px;
+}
+h1 {
+    color: #093cab;
+    margin-bottom: 20px;
+}
+input, select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+input:focus, select:focus {
+    border-color: #093cab;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #093cab;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0a5f8b;
+    cursor: pointer;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #093cab; 
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+    margin-bottom: auto;
+}
+
+footer {
+    position: relative; /* Muda para relative para não ficar fixo */
+    background-color: rgba(9, 60, 171, 0.8); /* Fundo com leve transparência */
+    color: white;
+    padding: 20px 10px;
+    text-align: center;
+    border-top-left-radius: 10px; /* Bordas arredondadas */
+    border-top-right-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+footer p {
+    margin: 5px 0; /* Espaçamento entre os parágrafos */
+    line-height: 1.5; /* Aumenta o espaçamento entre linhas */
+}
+
+footer img {
+    max-width: 80px; /* Limita o tamanho da imagem */
+    margin-bottom: 10px; /* Espaçamento abaixo da imagem */
+}
+
+
+

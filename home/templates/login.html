@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <script>
+        function toggleCpfField(checkbox) {
+            const cpfField = document.getElementById('cpfField');
+            const matriculaLabel = document.getElementById('matriculaLabel')
+            if (checkbox.checked) {
+                cpfField.style.display = 'block';
+                matriculaLabel.innerText = 'CPF:'; // Muda o texto da label para CPF
+            } else {
+                cpfField.style.display = 'none';
+                matriculaLabel.innerText = 'Matrícula:'; // Volta para o texto original
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Usuários da Biblioteca</h1>
+        <form method="POST">
+            {% csrf_token %}
+
+            <label for="nome_completo">Nome Completo:</label>
+            <input type="text" id="nome_completo" name="nome_completo" required>
+
+            <label class="form-check-label" for="flexCheckDefault">Visitante?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="visitante" onchange="toggleCpfField(this)">
+            </div>
+
+            <div id="cpfField">
+                <label for="cpf"></label>
+            </div>
+            
+            <label id="matriculaLabel" for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" name="matricula" required>
+
+            <label for="servico">Serviço que vai utilizar:</label>
+            <select id="servico" name="servico" required>
+                <option value="">Selecione um serviço</option>
+                <option value="circulacao">Pesquisa</option>
+                <option value="circulacao">Circulação(Empréstimo/Devolução)</option>
+                <option value="Consulta">Consulta</option>
+                <option value="BasedeDados">Base de Dados</option>
+            </select>
+
+            <button type="submit">Login</button>
+        </form>
+        <img src="{% static 'pessoas.png' %}" alt="people">
+    </div>
+</body>
+<footer>
+    <div class="col-sm-1" style="text-align:center">
+        <img alt="" src="/sites/icti.ufba.br/themes/ufba_bootstrap/logo.png">
+    </div>
+    <div class="col-sm-5">
+        <p style="text-align: center;">
+            <strong style="font-size: 14px">Universidade Federal da Bahia<br>
+            Biblioteca Valterlinda Queiroz</strong><br>
+            Endereço: Rua do Telegráfo, S/N<br>
+            Centro - CEP: 42809-000 | Camaçari-BA<br>
+            Telefone Geral: (71)3644-9486 / 3283-5772
+        </p>
+    </div>
+</footer>
+</html>

@@ -1,0 +1,127 @@
+/* welcome.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    background-image: url('background_image1.jpeg');
+}
+
+h1 {
+    color: #4a90e2;
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 1.2em;
+    line-height: 1.5;
+    text-align: center;
+}
+
+a {
+    color: #e94e77;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+}
+
+.views-field {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.field-content {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espaço entre os ícones */
+}
+
+.instagram-link img {
+    background-color: #4a90e2; /* Cor do rodapé */
+    border-radius: 10px; /* Cantos arredondados */
+    padding: 5px; /* Espaço entre a imagem e o fundo */
+}
+
+
+footer {
+    position: relative; /* Muda para relative para não ficar fixo */
+    background-color: rgba(9, 60, 171, 0.8); /* Fundo com leve transparência */
+    color: white;
+    padding: 20px 10px;
+    text-align: center;
+    border-top-left-radius: 10px; /* Bordas arredondadas */
+    border-top-right-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+footer p {
+    margin: 5px 0; /* Espaçamento entre os parágrafos */
+    line-height: 1.5; /* Aumenta o espaçamento entre linhas */
+}
+
+footer img {
+    max-width: 80px; /* Limita o tamanho da imagem */
+    margin-bottom: 10px; /* Espaçamento abaixo da imagem */
+}
+
+.col-sm-1, .col-sm-5 {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.col-sm-1 {
+    width: 20%;
+}
+
+.col-sm-5 {
+    width: 75%;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    p {
+        font-size: 1em;
+    }
+
+    .col-sm-1, .col-sm-5 {
+        width: 100%;
+        display: block;
+        margin: 0;
+    }
+
+    .col-sm-1 {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+
+    p {
+        font-size: 0.9em;
+    }
+
+    footer img {
+        max-width: 60px;
+    }
+}

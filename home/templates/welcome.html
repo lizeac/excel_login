@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'welcome.css' %}">
+    <title>Bem-vindo</title>
+</head>
+<body>
+    <img src="{% static 'welcome_image.png' %}" alt="Biblioteca"><br>
+    <!-- logo do Pergamum  -->
+    <h1>Bem-vindo!</h1>
+    <p>Você fez login com sucesso!</p>
+    <p>Aproveite e siga a gente nas redes sociais!
+    Fique por dentro das notícias da nossa biblioteca e de nosso Instituto!
+    </p>
+
+    <div class="views-field views-field-field-banner">        
+        <div class="field-content imagem-institucional" style="text-align: center;">
+            <a href="https://www.instagram.com/biblioteca_valterlinda_queiroz/?hl=en" target="_blank" class="instagram-link">
+                <img typeof="foaf:Image" class="img-responsive" src="{% static 'instagram.png' %}" width="40" height="40" alt="">
+            </a>
+            
+        </div>  
+    </div>
+    <p>
+        Navegue também por nosso acervo no site do<a style="color: blue;" href="http://www.pergamum.bib.ufba.br/pergamum/biblioteca/index.php" target="_blank"> Pergamum</a>!
+    </p>
+</body>
+<footer>
+    <div style="text-align: center;">
+        <p style="font-size: 14px; margin: 10px 0;">
+            <strong>Universidade Federal da Bahia<br>
+            Biblioteca Valterlinda Queiroz</strong><br>
+            Endereço: Rua do Telegráfo, S/N<br>
+            Centro - CEP: 42809-000 | Camaçari-BA<br>
+            Telefone Geral: (71)3644-9486 / 3283-5772
+        </p>
+    </div>
+</footer>
+</html>
