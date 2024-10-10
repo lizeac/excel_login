@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from validate_docbr import CPF
 
-arquivo = r'E:\LízeaStuff\excel_login\matricula_alunos.xlsx'
+arquivo = r'E:\LizeaStuff\excel_login\matricula_alunos.xlsx'
 
 wb = load_workbook(arquivo)
 ws = wb['Alunos']
