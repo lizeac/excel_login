@@ -11,10 +11,10 @@ qtde_produtos = 10
 ticket_medio = faturamento / qtde_produtos
 
 # configurar as informações do seu e-mail
-email.To = "pythonimpressionador@gmail.com; pythonimpressionador+lira@gmail.com"
+email.To = "python@gmail.com;"
 email.Subject = "E-mail automático do Python"
 email.HTMLBody = f"""
-<p>Olá Lira, aqui é o código Python</p>
+<p>Olá , aqui é o código Python</p>
 
 <p>O faturamento da loja foi de R${faturamento}</p>
 <p>Vendemos {qtde_produtos} produtos</p>
