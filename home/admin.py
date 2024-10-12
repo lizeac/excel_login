@@ -4,6 +4,7 @@ from django.db.models import Count
 from datetime import datetime
 from .models import LoginRecord
 
+# criação das ações
 @admin.action(description='Gerar Relatório do Mês Atual')
 def gerar_relatorio_mes_atual(modeladmin, request, queryset):
     mes_atual = datetime.now().month
@@ -18,7 +19,7 @@ def mostrar_todos_usuarios(modeladmin, request, queryset):
     ano_atual = datetime.now().year
     registros = LoginRecord.objects.filter(data_acesso__year=ano_atual)
     
-    # HTML básico para listar os usuários
+    # HTML básico para listar os usuários, porque o render tava me dando trabalho
     html = """
     <html>
         <head><title>Usuários do Ano</title></head>
@@ -75,7 +76,7 @@ class LoginRecordAdmin(admin.ModelAdmin):
     def gerar_relatorio_mes_view(self, request, mes):
         registros = LoginRecord.objects.filter(data_acesso__month=mes)
 
-        # Total de visitantes do mês atual
+        # Total de visitantes do mês atual 
         total_visitantes_mes = registros.filter(visitante='Visitante').count() + \
                                registros.filter(visitante='Usuário UFBA').count()
 
@@ -90,7 +91,8 @@ class LoginRecordAdmin(admin.ModelAdmin):
                                registros.filter(visitante='Usuário UFBA').count()
 
         return self._gerar_relatorio_contexto(request, registros, ano=ano_atual, total_visitantes=total_visitantes_ano)
-
+    
+    # gerar relatorios 
     def _gerar_relatorio_contexto(self, request, registros, mes=None, ano=None, total_visitantes=0):
         visitante_mais_frequente = registros.values('matricula', 'nome_completo').annotate(
             total_acessos=Count('id')
