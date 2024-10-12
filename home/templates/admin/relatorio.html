@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h2>Relatório de Acessos para o mês {{ mes }}</h2>
+  <p><strong>Visitante mais frequente do mês:</strong> {{ visitante_mais_frequente.nome_completo if visitante_mais_frequente else 'Nenhum' }}</p>
+  <p><strong>Data com mais logins:</strong> {{ data_com_mais_logins.data_acesso if data_com_mais_logins else 'Nenhum' }}</p>
+  <p><strong>Serviço mais utilizado:</strong> {{ servico_mais_utilizado.servico if servico_mais_utilizado else 'Nenhum' }}</p>
+  <p><strong>Curso mais frequente:</strong> {{ curso_mais_frequente.curso if curso_mais_frequente else 'Nenhum' }}</p>
+  <p><strong>Período do dia com mais visitas:</strong> {{ periodo_mais_frequente }}</p>
+  <p><strong>Proporção de visitantes:</strong> {{ percentual_visitantes|floatformat:2 }}%</p>
+  <p><strong>Proporção de usuários UFBA:</strong> {{ percentual_ufba|floatformat:2 }}%</p>
+{% endblock %}

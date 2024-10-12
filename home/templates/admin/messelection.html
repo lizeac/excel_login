@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>Escolha o Mês para o Relatório</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <label for="mes">Selecione o Mês:</label>
+    <select name="mes" id="mes">
+      <option value="">--Selecione--</option>
+      {% for i in range(1, 13) %}
+        <option value="{{ i }}">{{ i }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Gerar Relatório</button>
+  </form>
+{% endblock %}
