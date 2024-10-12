@@ -121,13 +121,13 @@ class LoginRecordAdmin(admin.ModelAdmin):
         contagem_servicos = registros.values('servico').annotate(total=Count('id')).order_by('-total')
 
         # Formatação dos serviços
-        servicos_str = "\n".join([f"           - {servico['servico']}: {servico['total']} utilizações" for servico in contagem_servicos])
+        servicos_str = "\n".join([f"       - {servico['servico']}: {servico['total']} utilizações" for servico in contagem_servicos])
 
         relatorio = f"""
         Relatório {'do Mês' if mes else 'do Ano'}
         {'Mês: ' + str(mes) if mes else 'Ano: ' + str(ano)}
         
-        Total de Visitantes: {total_visitantes}  # Novo total de visitantes
+        Total de Visitantes: {total_visitantes} 
         
         1. Visitante Mais Frequente:
         - Nome: {visitante_mais_frequente.get('nome_completo', 'N/A')}
