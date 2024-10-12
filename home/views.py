@@ -1,9 +1,20 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import LoginRecord  # Importar o modelo  que criei
+from home.models import LoginRecord  # Importar o modelo  que criei
 from validate_docbr import CPF
 from datetime import datetime
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
+from django.db.models import Count
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+dates = datetime.now().date()
+# month = dates.strftime('%m')
+# year = dates.strftime('%Y')
+# user_access_date = dates.strftime('%d/%m/%Y')
+user_access_hour = datetime.now().time()
+
 
 arquivo = 'matricula_alunos.xlsx'
 
@@ -34,6 +45,7 @@ def login_view(request):
         matricula = request.POST.get('matricula')
         nome_completo = request.POST.get('nome_completo')
         servico = request.POST.get('servico')
+        curso = request.POST.get('curso')
 
         if not matricula or not nome_completo or not servico:
             return HttpResponse("Todos os campos são obrigatórios. Volte e preencha todos os campos.")
@@ -51,8 +63,8 @@ def login_view(request):
 
         if cpf.validate(matricula) or check_mat(matricula):
             # Verifica se o usuário já fez login hoje
-            today = datetime.now().date()
-            if LoginRecord.objects.filter(matricula=matricula, data_acesso=today).exists():
+
+            if LoginRecord.objects.filter(matricula=matricula, data_acesso=dates).exists():
                 return HttpResponse("Você já fez login hoje!")
 
             # Armazena os dados no banco de dados
@@ -60,14 +72,15 @@ def login_view(request):
                 matricula=matricula,
                 nome_completo=nome_completo,
                 servico=servico,
-                data_acesso=today,
-                hora_acesso=datetime.now().time(),
-                visitante=visitante
-            )
-
+                data_acesso=dates,
+                hora_acesso=user_access_hour,
+                visitante=visitante,
+                curso = curso)
             return redirect('welcome_view')
 
     return render(request, 'login.html')
 
 def welcome_view(request):
     return render(request, 'welcome.html')
+
+

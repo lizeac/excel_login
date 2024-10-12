@@ -7,6 +7,8 @@ class LoginRecord(models.Model):
     data_acesso = models.DateField()
     hora_acesso = models.TimeField()
     visitante = models.CharField(max_length=50)
+    curso = models.CharField(max_length=20)
+
 
     def __str__(self):
         return self.nome_completo
