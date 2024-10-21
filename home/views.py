@@ -75,7 +75,8 @@ def login_view(request):
                 data_acesso=dates,
                 hora_acesso=user_access_hour,
                 visitante=visitante,
-                curso = curso)
+                curso = curso,
+                )
             return redirect('welcome_view')
 
     return render(request, 'login.html')
