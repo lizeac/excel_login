@@ -15,8 +15,9 @@ dates = datetime.now().date()
 # user_access_date = dates.strftime('%d/%m/%Y')
 user_access_hour = datetime.now().time()
 
-
+#Arquivo onde checo se a matricula dos alunos é valida
 arquivo = 'matricula_alunos.xlsx'
+
 
 wb = load_workbook(arquivo)
 ws = wb['Alunos']

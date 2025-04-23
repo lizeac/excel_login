@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from datetime import datetime
 from .models import LoginRecord
+from pdf_generator import gerar_pdf_relatorio
 
 # criação das ações
 @admin.action(description='Gerar Relatório do Mês Atual')
