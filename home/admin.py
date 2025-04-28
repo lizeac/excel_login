@@ -3,8 +3,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from datetime import datetime
 from .models import LoginRecord
-from pdf_generator import gerar_pdf_relatorio
-
+from .pdf_generator import gerar_pdf_relatorio
 # criação das ações
 @admin.action(description='Gerar Relatório do Mês Atual')
 def gerar_relatorio_mes_atual(modeladmin, request, queryset):
@@ -133,16 +132,16 @@ class LoginRecordAdmin(admin.ModelAdmin):
         Total de Visitantes: {total_visitantes} 
         
         1. Visitante Mais Frequente:
-        - Nome: {visitante_mais_frequente.get('nome_completo', 'N/A')}
-        - Total de Acessos: {visitante_mais_frequente.get('total_acessos', 0)}
+        - Nome: {visitante_mais_frequente.get('nome_completo', 'N/A') if visitante_mais_frequente else "N/A"}
+        - Total de Acessos: {visitante_mais_frequente.get('total_acessos', 0) if visitante_mais_frequente else 0 }
         
         2. Data com Mais Logins:
-        - Data: {data_com_mais_logins.get('data_acesso', 'N/A')}
-        - Total de Logins: {data_com_mais_logins.get('total_logins', 0)}
+        - Data: {data_com_mais_logins.get('data_acesso', 'N/A') if data_com_mais_logins else "N/A"}
+        - Total de Logins: {data_com_mais_logins.get('total_logins', 0) if data_com_mais_logins else 0}
         
         3. Serviço Mais Utilizado:
-        - Serviço: {servico_mais_utilizado.get('servico', 'N/A')}
-        - Total de Utilizações: {servico_mais_utilizado.get('total_utilizacoes', 0)}
+        - Serviço: {servico_mais_utilizado.get('servico', 'N/A') if servico_mais_utilizado else "N/A"}
+        - Total de Utilizações: {servico_mais_utilizado.get('total_utilizacoes', 0)if servico_mais_utilizado else 0}
 
         4. Curso Mais Frequente:
         - Curso: {curso_mais_frequente.get('curso', 'N/A')}

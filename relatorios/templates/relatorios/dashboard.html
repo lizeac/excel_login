@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Relatórios</title>
+</head>
+<body>
+    <h1>Dashboard de Relatórios</h1>
+
+    <form method="get">
+        <label for="ano">Escolha o Ano:</label>
+        <select name="ano" id="ano">
+            <option value="">Todos</option>
+            {% for ano in anos_disponiveis %}
+                <option value="{{ ano }}" {% if ano|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>{{ ano }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="mes">Escolha o Mês:</label>
+        <select name="mes" id="mes">
+            <option value="todos">Todos</option>
+            {% for numero, nome in meses_disponiveis %}
+                <option value="{{ numero }}" {% if numero == mes_selecionado %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+            {% endfor %}
+        </select>
+        
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <h2>Registros:</h2>
+    <ul>
+        {% for registro in registros %}
+            <li>{{ registro.nome_completo }} - {{ registro.data_acesso }}</li>
+        {% empty %}
+            <li>Nenhum registro encontrado.</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>

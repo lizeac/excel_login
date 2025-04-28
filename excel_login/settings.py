@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'relatorios',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'excel_login.wsgi.application'
+
 
 
 # Database

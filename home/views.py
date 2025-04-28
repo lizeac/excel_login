@@ -22,7 +22,7 @@ arquivo = 'matricula_alunos.xlsx'
 wb = load_workbook(arquivo)
 ws = wb['Alunos']
 
-
+# colocando coisas no excel
 c = []
 for r in ws:
     for w in r:
@@ -80,9 +80,11 @@ def login_view(request):
                 )
             return redirect('welcome_view')
 
-    return render(request, 'login.html')
+    return render(request, 'home/login.html')
+
+
 
 def welcome_view(request):
-    return render(request, 'welcome.html')
+    return render(request, 'home/welcome.html')
 
 
