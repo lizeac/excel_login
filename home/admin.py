@@ -3,7 +3,10 @@ from django.http import HttpResponse
 from django.db.models import Count
 from datetime import datetime
 from .models import LoginRecord
-from .pdf_generator import gerar_pdf_relatorio
+from relatorios.pdf_generator import gerar_pdf_relatorio
+from relatorios.extractor_data import DataExtractor
+
+
 # criação das ações
 @admin.action(description='Gerar Relatório do Mês Atual')
 def gerar_relatorio_mes_atual(modeladmin, request, queryset):
@@ -92,69 +95,17 @@ class LoginRecordAdmin(admin.ModelAdmin):
 
         return self._gerar_relatorio_contexto(request, registros, ano=ano_atual, total_visitantes=total_visitantes_ano)
     
+
+
+    #####################################################################################################################
     # gerar relatorios 
     def _gerar_relatorio_contexto(self, request, registros, mes=None, ano=None, total_visitantes=0):
-        visitante_mais_frequente = registros.values('matricula', 'nome_completo').annotate(
-            total_acessos=Count('id')
-        ).order_by('-total_acessos').first()
-
-        data_com_mais_logins = registros.values('data_acesso').annotate(
-            total_logins=Count('id')
-        ).order_by('-total_logins').first()
-
-        servico_mais_utilizado = registros.values('servico').annotate(
-            total_utilizacoes=Count('id')
-        ).order_by('-total_utilizacoes').first()
-
-        curso_mais_frequente = registros.values('curso').annotate(
-            total_logins=Count('id')
-        ).order_by('-total_logins').first()
-
-        am_visitas = registros.filter(hora_acesso__lt='12:00:00').count()
-        pm_visitas = registros.filter(hora_acesso__gte='12:00:00').count()
-        periodo_mais_frequente = 'Manhã' if am_visitas > pm_visitas else 'Tarde'
-
-        total_usuarios_ufba = registros.filter(visitante='Usuário UFBA').count()
-        total = total_visitantes  # Agora usando a variável passada
-        percentual_visitantes = (total_visitantes / total) * 100 if total > 0 else 0
-        percentual_ufba = (total_usuarios_ufba / total) * 100 if total > 0 else 0
-
-        # Contagem de cada serviço
-        contagem_servicos = registros.values('servico').annotate(total=Count('id')).order_by('-total')
-
-        # Formatação dos serviços
-        servicos_str = "\n".join([f"       - {servico['servico']}: {servico['total']} utilizações" for servico in contagem_servicos])
-
-        relatorio = f"""
-        Relatório {'do Mês' if mes else 'do Ano'}
-        {'Mês: ' + str(mes) if mes else 'Ano: ' + str(ano)}
         
-        Total de Visitantes: {total_visitantes} 
-        
-        1. Visitante Mais Frequente:
-        - Nome: {visitante_mais_frequente.get('nome_completo', 'N/A') if visitante_mais_frequente else "N/A"}
-        - Total de Acessos: {visitante_mais_frequente.get('total_acessos', 0) if visitante_mais_frequente else 0 }
-        
-        2. Data com Mais Logins:
-        - Data: {data_com_mais_logins.get('data_acesso', 'N/A') if data_com_mais_logins else "N/A"}
-        - Total de Logins: {data_com_mais_logins.get('total_logins', 0) if data_com_mais_logins else 0}
-        
-        3. Serviço Mais Utilizado:
-        - Serviço: {servico_mais_utilizado.get('servico', 'N/A') if servico_mais_utilizado else "N/A"}
-        - Total de Utilizações: {servico_mais_utilizado.get('total_utilizacoes', 0)if servico_mais_utilizado else 0}
+        if mes:
+            relatorio = DataExtractor(mes)
+            header = f"Relatório do mês {mes}"
+        else:
+            relatorio = "Relatório anual ainda não implementado."
+            header = "Relatório Anual"
 
-        4. Curso Mais Frequente:
-        - Curso: {curso_mais_frequente.get('curso', 'N/A')}
-        - Total de Logins: {curso_mais_frequente.get('total_logins', 0)}
-        
-        5. Período Mais Frequente:
-        - Período: {periodo_mais_frequente}
-        
-        6. Percentual de Visitantes:
-        - Visitantes: {percentual_visitantes:.2f}%
-        - Usuários UFBA: {percentual_ufba:.2f}%
-        
-        7. Utilizações por Serviço:
-        {servicos_str}
-        """
-        return HttpResponse(relatorio, content_type="text/plain; charset=utf-8")
+        return gerar_pdf_relatorio(relatorio, header_relatorio=header)

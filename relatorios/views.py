@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models.functions import ExtractYear
 from django.contrib.auth.decorators import user_passes_test, login_required
-
+from home.models import LoginRecord
 # importar o banco de dados do que os alunos forneceram
 from home.models import LoginRecord
 from datetime import datetime
@@ -23,12 +23,12 @@ MESES = [
 
 
 # só permitir superusers
-# def superuser_required(user):
-#     return user.is_superuser
+def superuser_required(user):
+    return user.is_superuser
 
 # # Create your views here.
-# @login_required(login_url='/admin/login/')
-# @user_passes_test(superuser_required)
+@login_required(login_url='/admin/login/')
+@user_passes_test(superuser_required)
 def dashboard_view(request):
     # salvar os dados do que o usuario da dashboard selecionou
     ano_selecionado = request.GET.get('ano')

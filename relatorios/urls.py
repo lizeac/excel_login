@@ -1,4 +1,5 @@
 from django.urls import path
+from home.models import LoginRecord
 from . import views
 
 urlpatterns = [

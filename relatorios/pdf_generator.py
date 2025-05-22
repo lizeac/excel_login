@@ -1,15 +1,73 @@
 from reportlab.lib.pagesizes import A4
+from home.models import LoginRecord
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from django.http import FileResponse
 import io
 from datetime import datetime
+from relatorios.extractor_data import DataExtractor
+
 
 months_name = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
 data_month = datetime.now().strftime('%m')
 data_month = int(data_month)
 month_name = months_name[data_month-1]
+
+
+
+
+
+
+extrator = DataExtractor(mes=8)
+pessoamais = extrator.gerar_dados()
+print(pessoamais)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def gerar_pdf_relatorio(relatorio_body, header_relatorio="Relatório", pic_cabecalho_path="\excel_login\staticfiles\brasao_icti.png"):
@@ -50,7 +108,7 @@ def gerar_pdf_relatorio(relatorio_body, header_relatorio="Relatório", pic_cabec
     data_geracao = datetime.now().strftime('%d/%m/%Y')
     data_day = datetime.now().strftime('%d')
     data_year = datetime.now().strftime('%y')
-    p.drawRightString(largura - 2*cm, 2*cm, f"Gerado em {data_day} de {data_month} de {data_year}")
+    p.drawCentredString(largura - 2*cm, 2*cm, f"Gerado em {data_day} de {data_month} de {data_year}")
 
     p.showPage()
     p.save()
