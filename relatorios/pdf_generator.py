@@ -1,28 +1,92 @@
+
+from home.models import LoginRecord
+from datetime import datetime, date, time
+import random
+
+
+
+
 from reportlab.lib.pagesizes import A4
+# from django_setup import *
 from home.models import LoginRecord
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from django.http import FileResponse
 import io
-from datetime import datetime
-from relatorios.extractor_data import DataExtractor
+from datetime import datetime, date, time
+from relatorios.filter_setup import DataExtractor
+import random
 
 
+# x = datetime.time()
 months_name = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
 data_month = datetime.now().strftime('%m')
 data_month = int(data_month)
 month_name = months_name[data_month-1]
+alunos = {
+    'Ana Beatriz Moreira': '21230001',
+    'Bruno Carvalho Santos': '21230002',
+    'Camila Oliveira Ramos': '21230003',
+    'Daniela Ferreira Costa': '21230004',
+    'Eduardo Almeida Rocha': '21230005',
+    'Fernanda Souza Lima': '21230006',
+    'Gabriel Martins Silva': '21230007',
+    'Helena Castro Barreto': '21230008',
+    'Igor Teixeira Luz': '21230009',
+    'Joana Pires Andrade': '21230010',
+    'Kaio Mendes Ribeiro': '21230011',
+    'Larissa Gomes Duarte': '21230012',
+    'Matheus Nogueira Pinto': '21230013',
+    'Natália Barbosa Reis': '21230014',
+    'Otávio Farias Cunha': '21230015',
+    'Patrícia Dias Monteiro': '21230016',
+    'Rafael Menezes Braga': '21230017',
+    'Sabrina Cunha Lopes': '21230018',
+    'Thiago Rocha Fernandes': '21230019',
+    'Vitória Macedo Tavares': '21230020',
+    'Yasmin Andrade Luz': '21230021',
+    'Lucas Viana Correia': '21230022',
+    'Júlia Costa Moura': '21230023',
+    'Pedro Henrique Torres': '21230024',
+    'Marina Freitas Lopes': '21230025',
+    'Diego Cardoso Bastos': '21230026',
+    'Carolina Ribeiro Soares': '21230027',
+    'Renan Lima Marques': '21230028',
+    'Luana Carvalho Diniz': '21230029',
+    'Vinícius Figueiredo Sales': '21230030'
+}
 
 
 
 
+cursos = ['bi', 'eng producao', 'eng eletrica']
+servicos = ['consulta', 'pesquisa', 'referencia', 'circulacao']
+dia_semana = ['segunda', 'terca', 'quarta', 'quinta', 'sexta']
 
-
-extrator = DataExtractor(mes=8)
-pessoamais = extrator.gerar_dados()
-print(pessoamais)
-
+for i in range(100):
+    hora = random.randint(8, 18)
+    minutos = random.randint(0, 59)
+    mes = random.randint(2, 4) 
+    dia = random.randint(1, 20)
+    ano = 2024
+    nome_completo, matricula = random.choice(list(alunos.items()))
+    servico = random.choice(servicos)
+    data_acesso = date(ano, mes, dia)
+    hora_acesso = time(hora, minutos)
+    dia_da_semana = random.choice(dia_semana)
+    curso = random.choice(cursos)
+    #    
+    # 
+    LoginRecord.objects.create(
+        nome_completo = nome_completo,
+        matricula = matricula,
+        curso = curso,
+        hora_acesso = hora_acesso,
+        data_acesso = data_acesso,
+        servico = servico,
+        dia_da_semana = dia_da_semana,
+    )
 
 
 

@@ -4,7 +4,7 @@ from django.db.models import Count
 from datetime import datetime
 from .models import LoginRecord
 from relatorios.pdf_generator import gerar_pdf_relatorio
-from relatorios.extractor_data import DataExtractor
+from relatorios.filter_setup import DataExtractor
 
 
 # criação das ações

@@ -1,4 +1,3 @@
-from django_setup import *
 from home.models import LoginRecord
 from django.db.models import Count
 from django.db.models.functions import ExtractHour
@@ -6,6 +5,17 @@ import datetime
 from collections import Counter
 import matplotlib.pyplot as plt
 import os
+
+
+# função primordial para a execução da classe a seguir, recebe a condição de filtro necessaria
+def filter_of_period(ano, mes=None):
+    if mes and mes != "todos":
+        mes = int(mes)
+        return LoginRecord.objects.filter(data_acesso__month=mes, data_acesso__year=ano)
+
+    return LoginRecord.objects.filter(data_acesso__year=ano)
+
+
 
 def contar_ocorrencias_dias(mes, ano):
     dias = []
@@ -33,14 +43,10 @@ def contar_ocorrencias_dias(mes, ano):
 # Essa classe vai retornar um dicionario contendo todos os dados já filtrados.
 
 class DataExtractor:
-    def __init__(self, mes):
-        self.mes = mes
-        self.output_dir = "graficos"
+    def __init__(self, registros, output_dir="graficos"):
+        self.registros = registros
+        self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
-
-        # acessa todos os registros feitos que possuem na data_acesso o mês solicitado
-        self.registros = LoginRecord.objects.filter(data_acesso__month=mes)
-
         self.resultado = {}
 
     def calcular_totais(self):
@@ -58,12 +64,14 @@ class DataExtractor:
         # conta os usuários de acordo com ids únicos
         mais_frequente = (
             self.registros
-            .values('matricula', 'nome_completo', 'curso')
+            .values('matricula', 'nome_completo') #AQUI PRECISO ADICIONAR ,CURSO NO FIM, PRA FINS DE TESTE FOI REMOVIDO
             .annotate(total=Count('id'))
             .order_by('-total')
             .first()
         )
 
+
+# caso de empate, adicionar
         if mais_frequente:
             self.resultado['aluno_mais_frequente'] = {
                 mais_frequente['nome_completo']: {
@@ -135,14 +143,14 @@ class DataExtractor:
         plt.xticks(list(medias_por_hora.keys()))
         plt.grid(axis='y', linestyle='--', alpha=0.5)
         plt.tight_layout()
-        path_hora = os.path.join(self.output_dir, "grafico_media_por_hora.png")
+        path_hora = os.path.join(self.output_dir, f"grafico_media_hora_{self.mes}.png")
         plt.savefig(path_hora)
         plt.close()
 
         self.resultado['grafico_hora'] = path_hora
 
     # Pra quando adicionar a coluna dia da semana ao banco de dados:
-    def dia_semana_mais_frequente(self, output_dir="/tmp"):
+    def dia_semana_mais_frequente(self):
 
     # Agrupa por dia_da_semana e conta os acessos
         por_dia = (
@@ -167,7 +175,7 @@ class DataExtractor:
         self.resultado['media_por_dia_semana'] = medias
 
             # Gerar gráfico
-        dias_ordenados = ["Segunda-feira", "Terça-Feira", "Domingo"]
+        dias_ordenados = ["Segunda-feira", "Terça-Feira", "Quarta-Feira", "Quinta-feira", "Sexta-Feira", "Sabado"]
         valores = [medias.get(d, 0) for d in dias_ordenados]
 
         plt.figure(figsize=(10, 5))
@@ -178,7 +186,7 @@ class DataExtractor:
         plt.xticks(rotation=45)
         plt.grid(axis='y', linestyle='--', alpha=0.5)
         plt.tight_layout()
-        path_dia = os.path.join(self.output_dir, "grafico_media_por_dia_semana.png")
+        path_dia = os.path.join(self.output_dir, f"graf_media_dia_semana_{self.mes}.png")
         plt.savefig(path_dia)
         plt.close()
 
