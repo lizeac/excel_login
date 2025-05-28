@@ -19,12 +19,22 @@ def filter_of_period(ano, mes=None):
 
 def contar_ocorrencias_dias(mes, ano):
     dias = []
-    for dia in range(1, 32):
-        try:
-            data = datetime.date(ano, mes, dia)
-            dias.append(data.strftime('%A'))
-        except ValueError:
-            continue
+    # se o usuário escolher algum mes especificos e nao "todos" (relatório mensal)
+    if mes:
+        range_dias = range(1, 32)
+        meses = [mes]
+    else:
+        # relatorio anual
+        range_dias = range(1, 32)
+        meses = range(1, 13)
+
+    for m in meses:
+        for dia in range_dias:
+            try:
+                data = datetime.date(ano, m, dia)
+                dias.append(data.strftime('%A'))
+            except ValueError:
+                continue
 
     tradutor = {
         'Monday': 'Segunda-feira',
@@ -36,18 +46,20 @@ def contar_ocorrencias_dias(mes, ano):
         'Sunday': 'Domingo',
     }
 
-    dias_convertidos = [tradutor[d] for d in dias]
-    return dict(Counter(dias_convertidos))
+    dias_traduzidos = [tradutor[d] for d in dias]
+    return dict(Counter(dias_traduzidos))
 
 
 # Essa classe vai retornar um dicionario contendo todos os dados já filtrados.
 
 class DataExtractor:
-    def __init__(self, registros, output_dir="graficos"):
+    def __init__(self, registros, mes=None, output_dir="graficos"):
         self.registros = registros
+        self.mes = mes
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
         self.resultado = {}
+ 
 
     def calcular_totais(self):
         # Conta o total de usuários do mês
@@ -64,7 +76,7 @@ class DataExtractor:
         # conta os usuários de acordo com ids únicos
         mais_frequente = (
             self.registros
-            .values('matricula', 'nome_completo') #AQUI PRECISO ADICIONAR ,CURSO NO FIM, PRA FINS DE TESTE FOI REMOVIDO
+            .values('matricula', 'nome_completo') #AQUI PRECISO ADICIONAR ',CURSO' NO FIM, PRA FINS DE TESTE FOI REMOVIDO
             .annotate(total=Count('id'))
             .order_by('-total')
             .first()

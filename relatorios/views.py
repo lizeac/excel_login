@@ -42,8 +42,8 @@ def dashboard_view(request):
     if ano_selecionado:
         registros = registros.filter(data_acesso__year=ano_selecionado)
 
-    if mes_selecionado and mes_selecionado != "todos":
-        registros = registros.filter(data_acesso__month=mes_selecionado)
+        if mes_selecionado and mes_selecionado != "todos":
+            registros = registros.filter(data_acesso__month=mes_selecionado)
 
     context = {
     'registros': registros,
