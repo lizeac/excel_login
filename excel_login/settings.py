@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import django_on_heroku
 import dj_database_url
+import os
 
 
 from django.core.management import call_command
@@ -112,16 +113,15 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# Internationalization - colocado em portugues neste caso
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
+USE_L10N = True
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
+# dizendo onde ta a pasta de graficos
+GRAFICOS_URL = '/graficos/'
+GRAFICOS_ROOT = os.path.join(BASE_DIR,'graficos')
 
 
 

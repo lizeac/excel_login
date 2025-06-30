@@ -1,5 +1,5 @@
 from django.db import models
-
+from home.constants import TRANSLATOR
 class LoginRecord(models.Model):
     matricula = models.CharField(max_length=15)
     nome_completo = models.CharField(max_length=100)
@@ -20,15 +20,7 @@ class LoginRecord(models.Model):
             dia_em_ingles = self.data_acesso.strftime('%A')  # Monday, Tuesday...
 
             # Traduz para português (completo)
-            tradutor = {
-                'Monday': 'Segunda-feira',
-                'Tuesday': 'Terça-feira',
-                'Wednesday': 'Quarta-feira',
-                'Thursday': 'Quinta-feira',
-                'Friday': 'Sexta-feira',
-                'Saturday': 'Sábado',
-                'Sunday': 'Domingo',
-            }
+            tradutor = TRANSLATOR
 
             self.dia_da_semana = tradutor.get(dia_em_ingles, 'Desconhecido')
         super().save(*args, **kwargs)

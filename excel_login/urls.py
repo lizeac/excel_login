@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.urls import path 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,3 +26,5 @@ urlpatterns = [
     path('relatorios/', include('relatorios.urls')),  # Inclui as URLs do app relatorios
 
 ]
+
+urlpatterns += static(settings.GRAFICOS_URL, document_root=settings.GRAFICOS_ROOT) # Adiciona suporte a arquivos da pasta graficos/

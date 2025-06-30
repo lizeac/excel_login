@@ -8,6 +8,7 @@ from django.db.models import Count
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from home.constants import MATRICULA_STUDENTS
 
 dates = datetime.now().date()
 # month = dates.strftime('%m')
@@ -16,7 +17,7 @@ dates = datetime.now().date()
 user_access_hour = datetime.now().time()
 
 #Arquivo onde checo se a matricula dos alunos é valida
-arquivo = 'matricula_alunos.xlsx'
+arquivo = MATRICULA_STUDENTS
 
 
 wb = load_workbook(arquivo)

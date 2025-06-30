@@ -12,7 +12,9 @@
         <select name="ano" id="ano">
             <option value="">Todos</option>
             {% for ano in anos_disponiveis %}
-                <option value="{{ ano }}" {% if ano|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>{{ ano }}</option>
+                <option value="{{ ano }}" {% if ano_selecionado and ano|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>
+                    {{ ano }}
+                </option>
             {% endfor %}
         </select>
 
@@ -25,19 +27,91 @@
                 </option>
             {% endfor %}
         </select>
-        
 
         <button type="submit">Filtrar</button>
     </form>
-
+    {% load extras %}
+    {% if registros %}
     <h2>Registros:</h2>
     <ul>
         {% for registro in registros %}
-            <li>{{ registro.nome_completo }} - {{ registro.data_acesso }}</li>
+            <li>{{ registro.nome_completo }} – {{ registro.data_acesso|date:"d \\d\\e F \\d\\e Y" }}</li>
         {% empty %}
             <li>Nenhum registro encontrado.</li>
         {% endfor %}
     </ul>
+
+    <hr>
+
+    <h2>Resumo de Dados</h2>
+
+    <h3>📊 Dados Gerais</h3>
+    <ul>
+        <li>Total de acessos: {{ dados_gerais.total_acessos }}</li>
+        <li>Total de visitantes: {{ dados_gerais.total_visitantes }}</li>
+        <li>Total de usuários UFBA: {{ dados_gerais.total_usuario_ufba }}</li>
+    </ul>
+
+    <h3>👥 Usuário(s) mais assíduo(s)</h3>
+    <ul>
+        {% for usuario in usuario_assiduo %}
+            <li>{{ usuario.nome_completo }} — {{ usuario.total }} acesso(s)</li>
+        {% endfor %}
+    </ul>
+
+    <h3>🎓 Curso mais frequente</h3>
+    <p>
+        {% if curso_frequente.curso %}
+            {{ curso_frequente.curso }} – {{ curso_frequente.total }} acesso(s)
+        {% else %}
+            Nenhum curso encontrado.
+        {% endif %}
+    </p>
+
+    <h3>🛠️ Serviço mais utilizado</h3>
+    <p>
+        {% if servico_frequente.servico %}
+            {{ servico_frequente.servico }} – {{ servico_frequente.total }} uso(s)
+        {% else %}
+            Nenhum serviço encontrado.
+        {% endif %}
+    </p>
+
+    <h3>📅 Dia da semana com maior fluxo</h3>
+    <p>
+        {% if max_dia_semana.dia_da_semana %}
+            {{ max_dia_semana.dia_da_semana }} – {{ max_dia_semana.total }} acesso(s)
+        {% else %}
+            Nenhum dia encontrado.
+        {% endif %}
+    </p>
+
+
+    <h3>📈 Média de acessos por dia da semana</h3>
+
+    <ul>
+        {% for valor in media_dia_semana %}
+            <li>{{ dias_ordenados|index:forloop.counter0 }}: {{ valor }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>🕗 Média de acessos por hora</h3>
+    <ul>
+        {% for hora, media in media_horas.items %}
+            <li>{{ hora }}h: {{ media }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>📊 Gráfico: Média de acessos por hora</h3>
+    {% if grafico_hora %}
+        <img src="{{ grafico_hora_url }}" alt="Gráfico por hora" style="max-width: 100%; height: auto;">
+    {% endif %}
+
+    <h3>📊 Gráfico: Média de acessos por semana</h3>
+    {% if grafico_semana %}
+        <img src="{{ grafico_semana_url }}" alt="Gráfico por semana" style="max-width: 100%; height: auto;">
+    {% endif %}
+    {% endif %}
 
 </body>
 </html>
