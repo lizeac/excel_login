@@ -83,7 +83,7 @@ def contar_ocorrencias_dias(mes, ano):
                 except (ValueError, TypeError):
                     continue
         
-
+# dfdfd
     else:
         print('relatorio anual')
         # relatorio anual
