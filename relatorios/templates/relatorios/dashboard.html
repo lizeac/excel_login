@@ -10,7 +10,7 @@
     <form method="get">
         <label for="ano">Escolha o Ano:</label>
         <select name="ano" id="ano">
-            <option value="">Todos</option>
+            <option value="todos">Todos</option>
             {% for ano in anos_disponiveis %}
                 <option value="{{ ano }}" {% if ano_selecionado and ano|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>
                     {{ ano }}

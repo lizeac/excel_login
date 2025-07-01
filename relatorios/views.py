@@ -24,8 +24,8 @@ def dashboard_view(request):
     mes_selecionado = request.GET.get('mes')
 
     if ano_selecionado or mes_selecionado:
-        ano_selecionado = request.GET.get('ano')
-        mes_selecionado = request.GET.get('mes')
+        ano_selecionado = request.GET.get('ano').strip().lower()
+        mes_selecionado = request.GET.get('mes').strip().lower()
         queryset = filter_of_period( ano_selecionado, mes_selecionado)
 
         
@@ -44,10 +44,6 @@ def dashboard_view(request):
         grafico_hora_url = f"{settings.GRAFICOS_URL}{os.path.basename(grafico_hora)}"
         grafico_semana_url = f"{settings.GRAFICOS_URL}{os.path.basename(grafico_semana)}"
 
-
-
-
-        print('retornando como "sem ano e sem mes"')
     else:
         queryset = {
             'queryset': [],
