@@ -59,66 +59,64 @@ def filter_of_period(ano=None, mes=None):
 
 #---------------------------------------------------------------------------------------------------------------------------
 
-def contar_ocorrencias_dias(mes, ano):
+def contar_ocorrencias_dias(ano, mes):
+    print('relatorio mensal')
+    dias_da_semana = []
+    filtro_dias_semana = dict(Counter(dias_da_semana))
+    range_dias = range(1, 32)
+    dias_da_semana = []
+    meses_do_ano = LoginRecord.objects.annotate(meses=ExtractMonth('data_acesso')).values_list('meses', flat=True).distinct()
+    anos = (LoginRecord.objects.annotate(ano=ExtractYear('data_acesso')).values_list('ano', flat=True).distinct())
 
-    if mes != 'todos':
-        mes = int(mes)
-    if ano != 'todos':
-        ano = int(ano)
-    '''Dict: Conta quantas vezes cada dia da semana houveram no periodo selecionado'''
-    dias = []
-    # se o usuário escolher algum mes especificos e nao "todos" (relatório mensal)
-    if mes and mes !='todos':
-        print('relatorio mensal')
-        range_dias = range(1, 32)
-        meses = [mes]
+    try:
+        print(ano)
+        ano_int = int(ano)
+        try:
+            print('O ano foi convertido em inteiro. Logo, o ano é especifico')
+            mes_int = int(mes)
 
-        for m in meses:
-            for dia in range_dias:
-                try:
-                    # por algum motivo essa linha aqui abaixo ta dando erro
-                    # os valores estao sendo recebidos errados e eu nao sei dizer o porque.
-                    data = datetime.date(m, ano, dia)
-                    dias.append(data.strftime('%A'))
-                except (ValueError, TypeError):
-                    continue
-        
-# dfdfd
-    else:
-        print('relatorio anual')
-        # relatorio anual
-        range_dias = range(1, 32)
-        meses = range(1, 13)
-    
-        anos = (
-            LoginRecord.objects
-            .annotate(ano=ExtractYear('data_acesso'))
-            .values_list('ano', flat=True)
-            .distinct()
-        )
+            # Se passar pra linha seguinte significa q temos mes e ano especificos
+            for dia_especifico in range_dias:
+                data = datetime.date(ano_int, mes_int, dia_especifico)
+                dias_da_semana.append(data.strftime('%A'))
+                # agora so falta retornar o Counter
+            return filtro_dias_semana
 
-        # print(list(anos))
+        except (ValueError, TypeError):
+            print('Linha 72: Nao foi possivel converter mes_int em inteiro, logo, provavelmente mo mês é todos, mas o ano é especifico.')
+            meses_do_ano = LoginRecord.objects.annotate(meses=ExtractMonth('data_acesso')).values_list('meses', flat=True).distinct()
+            for mes_especifico in meses_do_ano:
+                for dia_especifico in range_dias:
+                    data = datetime.date(ano_int, mes_especifico, dia_especifico)
+                    dias_da_semana.append(data.strftime('%A'))
+            return filtro_dias_semana
+    except (ValueError, TypeError):
+        print('Linha 75: Nao foi possivel converter ano_int em inteiro, logo, provavelmente ano ano é todos.')
+        try:
+            mes_int = int(mes)
+            # Se passar é pq temos ano todos e mes especifico.
+            for ano_especifico in anos:
+                for dia_especifico in range_dias:
+                    data = datetime.date(ano_especifico, mes_int, dia_especifico)
+                    dias_da_semana.append(data.strftime('%A'))
+            return filtro_dias_semana
+
+        except (ValueError, TypeError):
+            # Se chegar aqui é pq o mes é todos e anos é todos
+            # Extrair anos existentes do banco de dados abaixo.           
+            for ano_especifico in anos:
+                for mes_especifico in meses_do_ano:
+                    for dia_especifico in range_dias:
+                        data = datetime.date(ano_especifico, mes_especifico, dia_especifico)
+                        dias_da_semana.append(data.strftime('%A'))
+                return filtro_dias_semana
 
 
-    # for m in meses:
-    #     for dia in range_dias:
-    #         try:
-    #             # por algum motivo essa linha aqui abaixo ta dando erro
-    #             # os valores estao sendo recebidos errados e eu nao sei dizer o porque.
-    #             data = datetime.date(m, ano, dia)
-    #             dias.append(data.strftime('%A'))
-    #         except (ValueError, TypeError):
-    #             continue
-        
-        
-
-    tradutor = TRANSLATOR
-    dias_traduzidos = [tradutor[d] for d in dias]
+       
     # counter retorna a contagem de cada um dos valores da lista. vai armazenar num dicionario
     # sendo o valor do dia a chave e a contagem dele o valor
-    for chave, valor in dict(Counter(dias_traduzidos)).items():
+    for chave, valor in filtro_dias_semana.items():
         print(f'chave {chave}, valor {valor}.')
-    return dict(Counter(dias_traduzidos))
 
 
 # -------------------------------------------------------------------------------------------------------------------------
