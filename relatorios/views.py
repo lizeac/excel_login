@@ -6,7 +6,7 @@ from home.constants import MONTHS, DIAS_ORDENADOS
 # importar o banco de dados do que os alunos forneceram
 from home.models import LoginRecord
 from datetime import datetime
-from relatorios.filter_setup import DataExtractor, filter_of_period, contar_ocorrencias_dias
+from relatorios.filter_setup import DataExtractor, filtro_de_periodo, contar_ocorrencias
 from django.conf import settings
 import os
 
@@ -23,10 +23,13 @@ def dashboard_view(request):
     ano_selecionado = request.GET.get('ano')
     mes_selecionado = request.GET.get('mes')
 
+    
+
     if ano_selecionado or mes_selecionado:
-        ano_selecionado = request.GET.get('ano').strip().lower()
-        mes_selecionado = request.GET.get('mes').strip().lower()
-        queryset = filter_of_period( ano_selecionado, mes_selecionado)
+        ano_selecionado = request.GET.get('ano')
+        mes_selecionado = request.GET.get('mes')
+        queryset = filtro_de_periodo(ano_selecionado, mes_selecionado)
+        contador_ocorrencias = contar_ocorrencias(ano_selecionado, mes_selecionado)
 
         
         extrator = DataExtractor(queryset.get('queryset', []), 
@@ -37,12 +40,14 @@ def dashboard_view(request):
         curso_frequente = extrator.curso_mais_assiduo() # dict
         servico_frequente = extrator.servico_mais_utilizado() # dict
         max_dia_semana = extrator.max_dia_semana() # 
-        media_dia_semana = extrator.media_dia_semana() # dict
+        media_dia_semana = contador_ocorrencias.get('media', {}) # dict
         media_horas = extrator.calcular_media_por_hora() # dict
         grafico_hora = extrator.gerar_graficos_hora(media_horas) # img
-        grafico_semana= extrator.gerar_grafico_semana(media_dia_semana) # img
+        grafico_semana= extrator.gerar_grafico_semana(list(media_dia_semana.values())) # img
         grafico_hora_url = f"{settings.GRAFICOS_URL}{os.path.basename(grafico_hora)}"
         grafico_semana_url = f"{settings.GRAFICOS_URL}{os.path.basename(grafico_semana)}"
+
+
 
     else:
         queryset = {

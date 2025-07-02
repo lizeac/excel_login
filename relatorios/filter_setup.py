@@ -11,33 +11,98 @@ from home.constants import TRANSLATOR, HORARIO_BIBLIOTECA, DIAS_ORDENADOS
 import math
 
 
+def dias_semana_todos_anos_um_mes(mes):   
+    """
+    mes: número do mês (ex: 9 para setembro)
+    anos: lista de anos (ex: [2024, 2025])
+    retorna: dicionário com dias da semana em inglês como chaves e total de ocorrências
+    """
+    anos_disponiveis = list((
+    LoginRecord.objects
+    .annotate(ano=ExtractYear('data_acesso'))
+    .values_list('ano', flat=True)
+    .distinct()
+    .order_by('ano')
+))
+    contador = Counter()
+    for ano in anos_disponiveis:
+        for dia in range(1, 32):  # de 1 a 31, o máximo possível
+            try:
+                data = datetime.date(ano, mes, dia)
+                dia_semana = data.strftime('%A')  # ex: 'Friday'
+                contador[dia_semana] += 1
+            except ValueError:
+                # Ignora datas inválidas como 31 de setembro
+                continue
+    contador_pt = {TRANSLATOR.get(k, k): v for k, v in contador_ordenado.items()}
+    contador_ordenado = {dia: contador_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
+    return dict(contador_ordenado)
 
 
-# função primordial para a execução da classe a seguir, recebe a condição de filtro necessaria
-# retorna um queryset seja um mensal ou um anual
-
-
-def gerar_dias_validos(lista_anos=None, lista_meses=None, range_dias=None):
-    '''Pra gerar uma lista grande com todos os dias da semana do historico do banco de dados'''
-    dias = []
-    for ano in lista_anos:
-        print("Anos:", ano)
-        print()
-        for mes in lista_meses:
-            print(f'Mês:{mes}/{ano}')
-            print()
-            for dia in range_dias:
+def dias_semana_todos():
+    anos_disponiveis = list((
+    LoginRecord.objects
+    .annotate(ano=ExtractYear('data_acesso'))
+    .values_list('ano', flat=True)
+    .distinct()
+    .order_by('ano')
+))
+    mes_atual = datetime.date.today().month
+    ano_atual = datetime.date.today().year
+    contador = Counter()
+    for ano in anos_disponiveis:
+        if ano != ano_atual:
+            meses = range(1, 13)
+        else:
+            meses = range(1, mes_atual+1)
+        for mes in meses:
+            for dia in range(1, 32):  # de 1 a 31, o máximo possível
                 try:
                     data = datetime.date(ano, mes, dia)
-                    dias.append(data.strftime('%A'))
-                    print(f"Data Válida: {ano}-{mes}-{dia}")
-                except (ValueError, TypeError):
-                    print(f"[ERRO] Data inválida: {ano}-{mes}-{dia}")
+                    dia_semana = data.strftime('%A')  # ex: 'Friday'
+                    contador[dia_semana] += 1
+                except ValueError:
+                    # Ignora datas inválidas como 31 de setembro
                     continue
-    return dias
+    contador_pt = {TRANSLATOR.get(k, k): v for k, v in contador.items()}
+    contador_ordenado = {dia: contador_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
+    return dict(contador_ordenado)
 
 
-def filter_of_period(ano=None, mes=None):
+# retorna um queryset seja um mensal ou um anual
+def ocorrencias_dias_semana(ano, mes=None):
+    dias_da_semana = []
+    range_dias = range(1, 32)
+
+    for dia in range_dias:
+        try:
+            if mes:
+                data = datetime.date(ano, mes, dia)
+            else:
+
+                # Se não tiver mês, gera todas as datas do ano (1 mês de cada)
+                for m in range(1, 13):
+                    data = datetime.date(ano, m, dia)
+                    dias_da_semana.append(data.strftime('%A'))
+                continue
+            dias_da_semana.append(data.strftime('%A'))
+        except ValueError:
+            continue  # pula dias inválidos como 30/02
+    dias_contados = dict(Counter(dias_da_semana))    
+    dias_da_semana_pt = {TRANSLATOR.get(k, k): v for k, v in dias_contados.items()}
+    contador_ordenado = {dia: dias_da_semana_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
+
+    return dict(Counter(contador_ordenado))
+
+def contar_e_traduzir(lista):
+    dicionario = dict(Counter(lista))
+    '''Pra gerar uma lista grande com todos os dias da semana do historico do banco de dados'''
+    for dia in list(dicionario.keys()):
+        novo_dia = TRANSLATOR.get(dia, dia)
+        dicionario[novo_dia] = dicionario.pop(dia)
+    return dicionario
+
+def filtro_de_periodo(ano=None, mes=None):
     '''Queryset: Filtra o periodo do ano de acordo com o inserido, sejam dados mensais ou anuais
     '''
     try:
@@ -81,108 +146,106 @@ def filter_of_period(ano=None, mes=None):
 
 #---------------------------------------------------------------------------------------------------------------------------
 
-def contar_ocorrencias_dias(ano, mes):
-    print('relatorio mensal')
+def contar_ocorrencias(ano=None, mes=None):
+    anos_disponiveis = list((
+    LoginRecord.objects.annotate(ano=ExtractYear('data_acesso')).values_list('ano', flat=True).distinct().order_by('ano')))
+        
     dias_da_semana = []
-    filtro = LoginRecord.objects.filter(data_acesso=datetime.date(2025, 6, 25))
     filtro_dias_semana = {}
-    range_dias = range(1, 32)
     mes_int, ano_int = None, None
-    meses_do_ano = list(LoginRecord.objects.annotate(meses=ExtractMonth('data_acesso')).values_list('meses', flat=True).distinct())
-    anos = list((LoginRecord.objects.annotate(ano=ExtractYear('data_acesso')).values_list('ano', flat=True).distinct()))
-    # transformar em set pra evitar repetições
+    print(f'Retornando dados referentes a mês: {mes} e ano: {ano}')
+    print()
 
     if 'todos' != ano and 'todos' != mes:
-        # Se passar significa q temos mes e ano especificos
+        # Se passar significa q temos MES e ANO ESPECIFICOS.
+        # Ex: 05/2024
         try:
-            ano_int, mes_int = int(ano), int(mes)       
-            for dia_especifico in range_dias:  
-                try:   
-                    data_filtrada = LoginRecord.objects.filter(data_acesso=datetime.date(ano_int, mes_int, dia_especifico))
-                    if data_filtrada:
-                        try:
-                            dias_da_semana.append(data_filtrada.strftime('%A'))
-                        except ValueError, TypeError:
-                            ...
+            # variaveis
+            resultados = {}
+            ano_int, mes_int = int(ano), int(mes)
+            contador_ocorrencias = ocorrencias_dias_semana(ano_int, mes_int)
+            ocorrencia_ordenada = {dia: contador_ocorrencias.get(dia, 0) for dia in DIAS_ORDENADOS}
+            media_ponderada = {}
 
+            # filtrar as datas que vao determinar os dias da semana
+            data_filtrada = list(LoginRecord.objects.filter(data_acesso__year=ano_int, data_acesso__month=mes_int))
+            # adicionar na lista os nomes de dias da semana
+            dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
+            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
+            contador_ordenado = {dia: filtro_dias_semana.get(dia, 0) for dia in DIAS_ORDENADOS}
+            resultados['dias_semana'] = contador_ordenado
 
-                except (ValueError, TypeError):
-                    continue
-            return filtro_dias_semana
+            # gerar a media correspondente a este periodo
+
+            for dia in contador_ordenado:
+                total = contador_ordenado[dia]
+                ocorrencia = ocorrencia_ordenada.get(dia, 0)
+                if ocorrencia:
+                    media = round(total/ocorrencia, 2)
+                else:
+                    media = 0
+                media_ponderada[dia] = media
+            resultados['media'] = media_ponderada
+            print('dias da semana: ', resultados['dias_semana'])
+            print('ocorrencias no periodo:' , ocorrencia_ordenada)
+            print('medias: ', resultados['media'])
+    
+            return resultados
         except (ValueError, TypeError):
-            print('Nao foi possivel converter ambos ANO e MES para INTEIRO\n')
-            return {}
+            print(f"[ERRO] Não foi possível converter ano/mes: {ano}, {mes} para inteiro.")
+            return {}  
+        
+        
     # ---------------------------------------------------------------------------------------------------------
 
     elif  'todos' == ano and 'todos' != mes:
         # aqui temos o caso do ano TODOS  e mes ESPECIFICO.
+        registros_periodo = LoginRecord.objects.filter(data_acesso__year__in=anos_disponiveis) #aqui extraimos os registros do periodo solicitado
+        resultado = {}
         try:
-            mes_int= int(mes)
-            for ano_especifico in anos:
-                
-                for dia_especifico in range_dias:
-                    try:
-                        data = datetime.date(ano_especifico, mes_int, dia_especifico)
-                        dias_da_semana.append(data.strftime('%A'))
-                    except (ValueError, TypeError):
-                        print(f'''Nao é valido o valor para datetime.date, dentro de ano TODOS e mes ESPECIFICO,
-                              [[ERRO] Data inválida: {ano_especifico}-{mes_int}-{dia_especifico}]''')
-            filtro_dias_semana = dict(Counter(dias_da_semana))
-            print(f'TOTAL: {Count(dias_da_semana)}')
-            print()
-            for item in dias_da_semana:
-
-                print(item)
-                print()
+            mes_int = int(mes)
+            contador_ocorrencia = dias_semana_todos_anos_um_mes(mes_int)
+            ocorrencia_ordenada = {dia: contador_ocorrencia.get(dia, 0) for dia in DIAS_ORDENADOS}
+            data_filtrada = list(LoginRecord.objects.filter(data_acesso__month=mes_int)) 
+            dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
+            filtro_dias_semana_pt = contar_e_traduzir(dias_da_semana)
+            contador_ordenado = {dia: filtro_dias_semana_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
             return filtro_dias_semana
+ 
         except (ValueError, TypeError):
-            print('Nao foi possível converter MES para INTEIRO.')
+            print(f'Nao foi possível converter mes: {mes} para INTEIRO.')
+            return {}
      # ---------------------------------------------------------------------------------------------------------
 
     elif 'todos' != ano and 'todos' == mes:
         # Caso ANO seja ESPECIFICO e MES seja TODOS.
+        resultado = {}
         try:
             ano_int = int(ano)
-            for mes_especifico in meses_do_ano:
-                for dia_especifico in range_dias:
-                    try:
-                        data = datetime.date(ano_int, mes_especifico, dia_especifico)
-                        dias_da_semana.append(data.strftime('%A'))
-                    except (ValueError, TypeError):
-                        print('Nao é valido o valor para datetime.date')
-            filtro_dias_semana = dict(Counter(dias_da_semana))
-            print(f'TOTAL: {Count(dias_da_semana)}')
-            print()
-            for item in dias_da_semana:
+            ocorrencias = ocorrencias_dias_semana(ano=ano_int)
+            data_filtrada = list(LoginRecord.objects.filter(data_acesso__year=ano_int)) 
+            dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
+            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
 
-                print(item)
-                print()
-            return filtro_dias_semana
+            return filtro_dias_semana 
         except (TypeError, ValueError):
-            print('Nao foi possivel converter ANO pra INTEIRO')
+            print(f'Nao foi possivel converter ano: {ano} pra inteiro')
+            return {}
     # ---------------------------------------------------------------------------------------------------------
      
     elif 'todos' == ano and 'todos' == mes:
         # CASO SEJAM TODOS AMBOS ANO E MES
+        resultado = {}
         try:
-            gerar_todos = gerar_dias_validos(anos, meses_do_ano, range_dias)
-    
-            filtro_dias_semana = dict(Counter(gerar_todos))     
-            print(f'TOTAL: {len(gerar_todos)}')
-            print()
-            print('total:' len(filtro_dias_semana))
-            return filtro_dias_semana           
+            data_filtrada = list(LoginRecord.objects.values_list('data_acesso', flat=True).distinct())
+            dias_da_semana.extend(i.strftime('%A') for i in data_filtrada)
+            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
 
+            return filtro_dias_semana 
         except (ValueError, TypeError):
-            print(f'Exceção ocorrida. aqui nesse caralho')
+            print(f'Exceção ocorrida. no ultimo caso')
             return {}
     # ---------------------------------------------------------------------------------------------------------
-
-       
-    # counter retorna a contagem de cada um dos valores da lista. vai armazenar num dicionario
-    # sendo o valor do dia a chave e a contagem dele o valor
-    # --------------------------------------------------------------------------------------------------------------
-
 
 # Essa classe vai retornar um dicionario contendo todos os dados já filtrados.
 
@@ -340,7 +403,7 @@ class DataExtractor:
             .annotate(total=Count('id'))
         )
 
-        dias_do_mes = contar_ocorrencias_dias(self.ano, self.mes)
+        dias_do_mes = contar_ocorrencias(self.ano, self.mes)
         print(  )
 
         medias = {}

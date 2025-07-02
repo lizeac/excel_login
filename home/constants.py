@@ -30,4 +30,4 @@ MONTHS = [
 ]
 
 HORARIO_BIBLIOTECA = range(8, 20)
-DIAS_ORDENADOS = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-Feira", "Sábado", "Domingo"]
+DIAS_ORDENADOS = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"]
