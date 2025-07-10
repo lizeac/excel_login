@@ -1,0 +1,83 @@
+/* Estilo geral */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f0f8ff; /* azul claro suave */
+    margin: 0;
+    padding: 40px 60px;
+    color: #333;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #003366;
+}
+
+h2, h3 {
+    color: #003366;
+    margin-top: 30px;
+}
+
+form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+form select {
+    margin-right: 20px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    padding: 6px 14px;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #004d99;
+}
+
+/* Listas de dados */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 10px 0;
+}
+
+li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Blocos de informação */
+section {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Imagens dos gráficos */
+img {
+    display: block;
+    margin: 20px auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}

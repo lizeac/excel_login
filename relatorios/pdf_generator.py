@@ -22,7 +22,7 @@ import random
 
 from home.models import LoginRecord
 
-LoginRecord.objects.filter(data_acesso__year=2024, data_acesso__month=4).count()
+# LoginRecord.objects.filter(data_acesso__year=2024, data_acesso__month=4).count()
 
 
 

@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Relatórios</title>
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
     <h1>Dashboard de Relatórios</h1>
@@ -30,88 +32,100 @@
 
         <button type="submit">Filtrar</button>
     </form>
+
     {% load extras %}
     {% if registros %}
-    <h2>Registros:</h2>
-    <ul>
-        {% for registro in registros %}
-            <li>{{ registro.nome_completo }} – {{ registro.data_acesso|date:"d \\d\\e F \\d\\e Y" }}</li>
-        {% empty %}
-            <li>Nenhum registro encontrado.</li>
-        {% endfor %}
-    </ul>
+        <section>
+            <h2>Registros:</h2>
+            <ul>
+                {% for registro in registros %}
+                    <li>{{ registro.nome_completo }} – {{ registro.curso }} - {{ registro.data_acesso|date:"d \\d\\e F \\d\\e Y" }} </li>
+                {% empty %}
+                    <li>Nenhum registro encontrado.</li>
+                {% endfor %}
+            </ul>
+        </section>
 
-    <hr>
+        <section>
+            <h2>Resumo de Dados</h2>
 
-    <h2>Resumo de Dados</h2>
+            <h3>📊 Dados Gerais</h3>
+            <ul>
+                <li>Total de acessos: {{ dados_gerais.total_acessos }}</li>
+                <li>Total de visitantes: {{ dados_gerais.total_visitantes }}</li>
+                <li>Total de usuários UFBA: {{ dados_gerais.total_usuario_ufba }}</li>
+            </ul>
+        </section>
 
-    <h3>📊 Dados Gerais</h3>
-    <ul>
-        <li>Total de acessos: {{ dados_gerais.total_acessos }}</li>
-        <li>Total de visitantes: {{ dados_gerais.total_visitantes }}</li>
-        <li>Total de usuários UFBA: {{ dados_gerais.total_usuario_ufba }}</li>
-    </ul>
+        <section>
+            <h3>👥 Usuário(s) mais assíduo(s)</h3>
+            <ul>
+                {% for usuario in usuario_assiduo %}
+                    <li>{{ usuario.nome_completo }} — {{ usuario.curso }} - {{ usuario.matricula }} {{ usuario.total }} acesso(s)</li>
+                {% endfor %}
+            </ul>
+        </section>
 
-    <h3>👥 Usuário(s) mais assíduo(s)</h3>
-    <ul>
-        {% for usuario in usuario_assiduo %}
-            <li>{{ usuario.nome_completo }} — {{ usuario.total }} acesso(s)</li>
-        {% endfor %}
-    </ul>
+        <section>
+            <h3>🎓 Curso mais frequente</h3>
+            <p>
+                {% if curso_frequente.curso %}
+                    {{ curso_frequente.curso }} – {{ curso_frequente.total }} acesso(s)
+                {% else %}
+                    Nenhum curso encontrado.
+                {% endif %}
+            </p>
+        </section>
+        
+        <section>
+            <h3>🛠️ Serviço mais utilizado</h3>
+            <p>
+                {% if servico_frequente.servico %}
+                    {{ servico_frequente.servico }} – {{ servico_frequente.total }} uso(s)
+                {% else %}
+                    Nenhum serviço encontrado.
+                {% endif %}
+            </p>
+        </section>
 
-    <h3>🎓 Curso mais frequente</h3>
-    <p>
-        {% if curso_frequente.curso %}
-            {{ curso_frequente.curso }} – {{ curso_frequente.total }} acesso(s)
-        {% else %}
-            Nenhum curso encontrado.
-        {% endif %}
-    </p>
+        <section>
+            <h3>📅 Dia da semana com maior fluxo</h3>
+            <p>
+                {% if max_dia_semana.dia_da_semana %}
+                    {{ max_dia_semana.dia_da_semana }} – {{ max_dia_semana.total }} acesso(s)
+                {% else %}
+                    Nenhum dia encontrado.
+                {% endif %}
+            </p>
+        </section>
 
-    <h3>🛠️ Serviço mais utilizado</h3>
-    <p>
-        {% if servico_frequente.servico %}
-            {{ servico_frequente.servico }} – {{ servico_frequente.total }} uso(s)
-        {% else %}
-            Nenhum serviço encontrado.
-        {% endif %}
-    </p>
+        <section>
+            <h3>📈 Total de acessos por dia da semana</h3>
+            <ul>
+                 {% for dia, valor in total_dia_semana_ordenado %}
+                    <li>{{ dia }}: {{ valor }}</li>
+                {% endfor %}
+            </ul>
+            {% if grafico_semana %}
+                <img src="{{ grafico_semana_url }}" alt="Gráfico por semana">
+            {% endif %}
+        </section>
 
-    <h3>📅 Dia da semana com maior fluxo</h3>
-    <p>
-        {% if max_dia_semana.dia_da_semana %}
-            {{ max_dia_semana.dia_da_semana }} – {{ max_dia_semana.total }} acesso(s)
-        {% else %}
-            Nenhum dia encontrado.
-        {% endif %}
-    </p>
-
-
-    <h3>📈 Média de acessos por dia da semana</h3>
-
-    <ul>
-        {% for valor in media_dia_semana %}
-            <li>{{ dias_ordenados|index:forloop.counter0 }}: {{ valor }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>🕗 Média de acessos por hora</h3>
-    <ul>
-        {% for hora, media in media_horas.items %}
-            <li>{{ hora }}h: {{ media }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>📊 Gráfico: Média de acessos por hora</h3>
-    {% if grafico_hora %}
-        <img src="{{ grafico_hora_url }}" alt="Gráfico por hora" style="max-width: 100%; height: auto;">
+        <section>
+            <h3>🕗 Média de acessos por hora</h3>
+            <ul>
+                {% for hora, media in media_horas.items %}
+                    <li>{{ hora }}h: {{ media }}</li>
+                {% endfor %}
+            </ul>
+            {% if grafico_hora %}
+                <img src="{{ grafico_hora_url }}" alt="Gráfico por hora">
+            {% endif %}
+        </section>
+            <a href="{% url 'pdf_view' %}?ano={{ ano_selecionado }}&mes={{ mes_selecionado }}" target="_blank">
+                📄 Visualizar Relatório em PDF
+        </form>
     {% endif %}
-
-    <h3>📊 Gráfico: Média de acessos por semana</h3>
-    {% if grafico_semana %}
-        <img src="{{ grafico_semana_url }}" alt="Gráfico por semana" style="max-width: 100%; height: auto;">
-    {% endif %}
-    {% endif %}
-
+    
 </body>
 </html>

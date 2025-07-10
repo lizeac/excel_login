@@ -4,105 +4,86 @@ import datetime
 from collections import Counter
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from django.db.models.functions import ExtractWeekDay, ExtractMonth, ExtractYear, ExtractHour
 import os
 from home.constants import TRANSLATOR, HORARIO_BIBLIOTECA, DIAS_ORDENADOS
 import math
 
 
-def dias_semana_todos_anos_um_mes(mes):   
-    """
-    mes: número do mês (ex: 9 para setembro)
-    anos: lista de anos (ex: [2024, 2025])
-    retorna: dicionário com dias da semana em inglês como chaves e total de ocorrências
-    """
-    anos_disponiveis = list((
-    LoginRecord.objects
-    .annotate(ano=ExtractYear('data_acesso'))
-    .values_list('ano', flat=True)
-    .distinct()
-    .order_by('ano')
-))
-    contador = Counter()
-    for ano in anos_disponiveis:
-        for dia in range(1, 32):  # de 1 a 31, o máximo possível
-            try:
-                data = datetime.date(ano, mes, dia)
-                dia_semana = data.strftime('%A')  # ex: 'Friday'
-                contador[dia_semana] += 1
-            except ValueError:
-                # Ignora datas inválidas como 31 de setembro
-                continue
-    contador_pt = {TRANSLATOR.get(k, k): v for k, v in contador_ordenado.items()}
-    contador_ordenado = {dia: contador_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
-    return dict(contador_ordenado)
-
-
-def dias_semana_todos():
-    anos_disponiveis = list((
-    LoginRecord.objects
-    .annotate(ano=ExtractYear('data_acesso'))
-    .values_list('ano', flat=True)
-    .distinct()
-    .order_by('ano')
-))
-    mes_atual = datetime.date.today().month
-    ano_atual = datetime.date.today().year
-    contador = Counter()
-    for ano in anos_disponiveis:
-        if ano != ano_atual:
-            meses = range(1, 13)
-        else:
-            meses = range(1, mes_atual+1)
-        for mes in meses:
-            for dia in range(1, 32):  # de 1 a 31, o máximo possível
-                try:
-                    data = datetime.date(ano, mes, dia)
-                    dia_semana = data.strftime('%A')  # ex: 'Friday'
-                    contador[dia_semana] += 1
-                except ValueError:
-                    # Ignora datas inválidas como 31 de setembro
-                    continue
-    contador_pt = {TRANSLATOR.get(k, k): v for k, v in contador.items()}
-    contador_ordenado = {dia: contador_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
-    return dict(contador_ordenado)
-
-
-# retorna um queryset seja um mensal ou um anual
-def ocorrencias_dias_semana(ano, mes=None):
-    dias_da_semana = []
-    range_dias = range(1, 32)
-
-    for dia in range_dias:
-        try:
-            if mes:
-                data = datetime.date(ano, mes, dia)
-            else:
-
-                # Se não tiver mês, gera todas as datas do ano (1 mês de cada)
-                for m in range(1, 13):
-                    data = datetime.date(ano, m, dia)
-                    dias_da_semana.append(data.strftime('%A'))
-                continue
-            dias_da_semana.append(data.strftime('%A'))
-        except ValueError:
-            continue  # pula dias inválidos como 30/02
-    dias_contados = dict(Counter(dias_da_semana))    
-    dias_da_semana_pt = {TRANSLATOR.get(k, k): v for k, v in dias_contados.items()}
-    contador_ordenado = {dia: dias_da_semana_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
-
-    return dict(Counter(contador_ordenado))
-
-def contar_e_traduzir(lista):
-    dicionario = dict(Counter(lista))
-    '''Pra gerar uma lista grande com todos os dias da semana do historico do banco de dados'''
+def traduzir_ordenar(dicionario):
+    '''recebe um dicionário de dias da semana e o organiza
+    '''
+    
     for dia in list(dicionario.keys()):
         novo_dia = TRANSLATOR.get(dia, dia)
         dicionario[novo_dia] = dicionario.pop(dia)
-    return dicionario
+    ordenado = {dia: dicionario.get(dia, 0) for dia in DIAS_ORDENADOS}
+    return ordenado
 
+def consultar_ocorrencias_periodo(ano=None, mes=None):  
+    if ano in (None, '', 'none'):
+        ano = 'todos'
+    if mes in (None, '', 'none'):
+        mes = 'todos' 
+    """
+    mes: número do mês (ex: 9 para setembro). Em caso de None retorna todos 12 meses do ano.
+    anos: caso seja None retornará dias da semana de todos os anos em q há registro no banco de dados
+    retorna: retorna ocorrencia de dias da semana dentro de determinado periodo
+    """
+
+    dias_da_semana = []
+    anos_disponiveis = []
+    range_dias = range(1, 32)
+    mes_atual = datetime.date.today().month
+    ano_atual = datetime.date.today().year
+    print(f'Foi solicitado fornecer dados referentes a: {ano}, {mes}')
+    if ano and ano != 'todos':
+        print('entra aqui no ano and ano nao todos')
+        try:
+            print('Ano existe, entao o ano será', anos_disponiveis)
+            ano = int(ano)
+            anos_disponiveis.append(ano)
+            print(type(ano))
+        except:
+            print('alguma porcaria aqui')
+    else:
+        anos_disponiveis = list((LoginRecord.objects.annotate(ano=ExtractYear('data_acesso')).values_list('ano', flat=True).distinct().order_by('ano')))
+        print('Ano nao existe especifico, logo, anos serão: ', anos_disponiveis)
+
+    for ano_especifico in anos_disponiveis:
+        if ano_especifico == ano_atual:
+            range_mes = range(1, mes_atual+1)
+        else:
+            range_mes = range(1, 13)
+        for dia in range_dias:
+            if mes:
+                try:
+                    data = datetime.date(ano_especifico, mes, dia)
+                    dias_da_semana.append(data.strftime('%A'))
+                except ValueError:
+                    print(f"\033[91mErro na Data: {dia} / {mes} /{ano_especifico}\033[0m")
+                    continue
+            else:
+                # Se não tiver mês, gera todas as datas do ano (1 mês de cada)
+                print('Nao tem mes, entao cai aqui')
+                for m in range_mes:
+                    try:
+                        data = datetime.date(ano_especifico, m, dia)
+                        dias_da_semana.append(data.strftime('%A'))
+                    except ValueError:
+                        print(f"\033[91mErro na Data: {dia}/{m}/{ano_especifico}\033[0m")
+                        continue  # pula dias inválidos como 30/02
+    contador = Counter(dias_da_semana)
+    contador_ordenado = traduzir_ordenar(contador)
+
+    for x, v in contador_ordenado.items():
+        print(f'{x}: {v}')
+        print()
+    return dict(contador_ordenado)
+
+# --------------------------------------------------------------------------------------------------------------------------
 def filtro_de_periodo(ano=None, mes=None):
+    print("[DEBUG] filtro_de_periodo foi chamada")
     '''Queryset: Filtra o periodo do ano de acordo com o inserido, sejam dados mensais ou anuais
     '''
     try:
@@ -145,106 +126,120 @@ def filtro_de_periodo(ano=None, mes=None):
             }
 
 #---------------------------------------------------------------------------------------------------------------------------
+def gerar_media_dia(dicionario, ocorrencias):
+    '''Gera uma média entre valores de dois dicionarios. O primeiro sao dados do banco de dados, o segundo sao dados reais do periodo'''
+    media_ponderada = {}
+    for dia in dicionario:
+        total = dicionario[dia]
+        ocorrencia = ocorrencias.get(dia, 0)
+        if ocorrencia:
+            media = round(total/ocorrencia, 2)
+        else:
+            media = 0
+        media_ponderada[dia] = media
+    return media_ponderada
+# ----------------------------------------------------------------------------------------------------
 
-def contar_ocorrencias(ano=None, mes=None):
-    anos_disponiveis = list((
-    LoginRecord.objects.annotate(ano=ExtractYear('data_acesso')).values_list('ano', flat=True).distinct().order_by('ano')))
-        
+def print_dados_resultados(dicionario,):
+    print('dias da semana: ', dicionario)
+
+    
+
+
+def contar_ocorrencias(ano=None, mes=None):   
+    if ano in (None, '', 'none', 'None'):
+        ano = 'todos'
+    if mes in (None, '', 'none', 'None'):
+        mes = 'todos'
     dias_da_semana = []
-    filtro_dias_semana = {}
     mes_int, ano_int = None, None
-    print(f'Retornando dados referentes a mês: {mes} e ano: {ano}')
+    print(f'\033[92mRetornando dados referentes a mês: {mes} e ano: {ano}\033[0m')
     print()
-
+    # 1 IF
     if 'todos' != ano and 'todos' != mes:
         # Se passar significa q temos MES e ANO ESPECIFICOS.
         # Ex: 05/2024
         try:
             # variaveis
-            resultados = {}
             ano_int, mes_int = int(ano), int(mes)
-            contador_ocorrencias = ocorrencias_dias_semana(ano_int, mes_int)
-            ocorrencia_ordenada = {dia: contador_ocorrencias.get(dia, 0) for dia in DIAS_ORDENADOS}
-            media_ponderada = {}
 
             # filtrar as datas que vao determinar os dias da semana
             data_filtrada = list(LoginRecord.objects.filter(data_acesso__year=ano_int, data_acesso__month=mes_int))
             # adicionar na lista os nomes de dias da semana
             dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
-            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
-            contador_ordenado = {dia: filtro_dias_semana.get(dia, 0) for dia in DIAS_ORDENADOS}
-            resultados['dias_semana'] = contador_ordenado
-
-            # gerar a media correspondente a este periodo
-
-            for dia in contador_ordenado:
-                total = contador_ordenado[dia]
-                ocorrencia = ocorrencia_ordenada.get(dia, 0)
-                if ocorrencia:
-                    media = round(total/ocorrencia, 2)
-                else:
-                    media = 0
-                media_ponderada[dia] = media
-            resultados['media'] = media_ponderada
-            print('dias da semana: ', resultados['dias_semana'])
-            print('ocorrencias no periodo:' , ocorrencia_ordenada)
-            print('medias: ', resultados['media'])
-    
-            return resultados
+            contador = dict(Counter(dias_da_semana))
+            # traduz e ordena os dados para padronizá-los
+            contador_ordenado = traduzir_ordenar(contador)
+ 
+            print_dados_resultados(contador_ordenado)
+            return contador_ordenado
         except (ValueError, TypeError):
-            print(f"[ERRO] Não foi possível converter ano/mes: {ano}, {mes} para inteiro.")
+            print(f"[ERRO] Não foi possível converter {ano}, {mes} para inteiro.")
             return {}  
         
         
     # ---------------------------------------------------------------------------------------------------------
-
+    # 1 ELIF
     elif  'todos' == ano and 'todos' != mes:
         # aqui temos o caso do ano TODOS  e mes ESPECIFICO.
-        registros_periodo = LoginRecord.objects.filter(data_acesso__year__in=anos_disponiveis) #aqui extraimos os registros do periodo solicitado
-        resultado = {}
+        # Exemplo: mes 01 de 2024, 2025
         try:
             mes_int = int(mes)
-            contador_ocorrencia = dias_semana_todos_anos_um_mes(mes_int)
-            ocorrencia_ordenada = {dia: contador_ocorrencia.get(dia, 0) for dia in DIAS_ORDENADOS}
+            # Extrai os dados do banco sobre as datas
             data_filtrada = list(LoginRecord.objects.filter(data_acesso__month=mes_int)) 
+            # Transforma esses dados em dia da semana
             dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
-            filtro_dias_semana_pt = contar_e_traduzir(dias_da_semana)
-            contador_ordenado = {dia: filtro_dias_semana_pt.get(dia, 0) for dia in DIAS_ORDENADOS}
-            return filtro_dias_semana
- 
+            contador_ordenado = dict(Counter(dias_da_semana))
+            # Traduz e ordena os dados
+            contador_ordenado = traduzir_ordenar(contador_ordenado)
+            # Gera media e adiciona os dados ao dicionario de resultados
+            print_dados_resultados(contador_ordenado)
+
+            return contador_ordenado
+
         except (ValueError, TypeError):
             print(f'Nao foi possível converter mes: {mes} para INTEIRO.')
+
             return {}
      # ---------------------------------------------------------------------------------------------------------
-
+    # 2 ELIF
     elif 'todos' != ano and 'todos' == mes:
         # Caso ANO seja ESPECIFICO e MES seja TODOS.
-        resultado = {}
+        resultados = {}
         try:
             ano_int = int(ano)
-            ocorrencias = ocorrencias_dias_semana(ano=ano_int)
+            # Extrair dados do banco de dados sobre data
             data_filtrada = list(LoginRecord.objects.filter(data_acesso__year=ano_int)) 
             dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
-            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
-
-            return filtro_dias_semana 
+            # Conta, traduz e ordena os dados
+            contador_ordenado = Counter(dias_da_semana)
+            contador_ordenado = traduzir_ordenar(contador_ordenado)
+            # Divide as ocorrências uma pela outra pra obter a media
+            # Adiciona ao dicionario os dados 
+            print_dados_resultados(contador_ordenado)
+            print()
+            return contador_ordenado
         except (TypeError, ValueError):
             print(f'Nao foi possivel converter ano: {ano} pra inteiro')
             return {}
     # ---------------------------------------------------------------------------------------------------------
-     
-    elif 'todos' == ano and 'todos' == mes:
+    # 3 ELIF
+    elif ano in 'todos' and mes in 'todos':
+        print(f'\033[94m dentro de elif, Retornando dados referentes a mês: {mes} e ano: {ano}\033[0m')
         # CASO SEJAM TODOS AMBOS ANO E MES
-        resultado = {}
         try:
-            data_filtrada = list(LoginRecord.objects.values_list('data_acesso', flat=True).distinct())
-            dias_da_semana.extend(i.strftime('%A') for i in data_filtrada)
-            filtro_dias_semana = contar_e_traduzir(dias_da_semana)
+            data_filtrada = list(LoginRecord.objects.all())
+            dias_da_semana.extend(i.data_acesso.strftime('%A') for i in data_filtrada)
 
-            return filtro_dias_semana 
+            contador_ordenado = Counter(dias_da_semana)
+            contador_ordenado = traduzir_ordenar(contador_ordenado)
+            print_dados_resultados(contador_ordenado)
+
+            return contador_ordenado
         except (ValueError, TypeError):
             print(f'Exceção ocorrida. no ultimo caso')
             return {}
+    
     # ---------------------------------------------------------------------------------------------------------
 
 # Essa classe vai retornar um dicionario contendo todos os dados já filtrados.
@@ -291,7 +286,7 @@ class DataExtractor:
         # conta o id de cada aluno com base na matricula
         mais_frequente = (
             self.registros
-            .values('matricula', 'nome_completo') #AQUI PRECISO ADICIONAR ',CURSO' NO FIM, PRA FINS DE TESTE FOI REMOVIDO
+            .values('matricula', 'nome_completo', 'curso') #AQUI PRECISO ADICIONAR ',CURSO' NO FIM, PRA FINS DE TESTE FOI REMOVIDO
             .annotate(total=Count('id'))
             .order_by('-total', 'nome_completo')
 
@@ -341,16 +336,12 @@ class DataExtractor:
         # 8 a 19 é o período de funcionamento da biblioteca
         acesso_por_hora = (
             self.registros
-            .annotate(hora=ExtractHour('hora_acesso'))
-            .filter(hora__gte=8, hora__lte=19)
-            .values('hora')
-            .annotate(total=Count('id'))
-            .order_by('hora')
-        )
-    
+            .annotate(hora=ExtractHour('hora_acesso')).filter(hora__gte=8, hora__lte=19).values('hora').annotate(total=Count('id')).order_by('hora'))
+
+
 
         # Vai ser necessário pra dividir e gerar a média
-        dias_com_acesso = self.registros.values('data_acesso').distinct().count()
+        dias_com_acesso = self.registros.values('data_acesso').count()
 
         # Dict comprehension: gera um valor 0 por chave (hora)
         # Preenche todas as horas com 0, pra garantir que mesmo as horas que não tenham acesso
@@ -360,24 +351,30 @@ class DataExtractor:
         for entrada in acesso_por_hora:
             hora = entrada['hora']
             total = entrada['total'] 
-            medias_hora[hora] = math.ceil(total / dias_com_acesso) if dias_com_acesso else 0
+            medias_hora[hora] = round(total / dias_com_acesso, 4) if dias_com_acesso else 0
         return medias_hora
 
     # --------------------------------------------------------------------------------------------------------
 
         # Gerar gráfico com os dados obtidos logo em seguida
     def gerar_graficos_hora(self, medias_hora):
+        import matplotlib.pyplot as plt
+
+        horas = list(medias_hora.keys())
+        valores = list(medias_hora.values())
+
         plt.figure(figsize=(10, 5))
-        plt.bar(medias_hora.keys(), medias_hora.values())
-        plt.title("Média de acessos por hora (08h às 19h)")
-        plt.xlabel("Hora do dia")
-        plt.ylabel("Média de acessos")
-        plt.xticks(list(medias_hora.keys()))
-        plt.grid(axis='y', linestyle='--', alpha=0.5)
+        plt.bar(horas, valores, width=0.6, edgecolor='#004080', color='#66b3ff')
+
+        plt.title("Média de acessos por hora (08h às 19h)", fontsize=14, fontweight='bold', color='#003366')
+        plt.xlabel("Hora do dia", fontsize=12)
+        plt.ylabel("Média de acessos", fontsize=12)
+        plt.xticks(horas)
+        plt.grid(axis='y', linestyle='--', alpha=0.4)
         plt.tight_layout()
+
         path_hora = os.path.join(self.output_dir, f"grafico_media_hora_{self.mes}_{self.ano}.png")
-        caminho_completo = os.path.join(self.output_dir, path_hora)
-        plt.savefig(caminho_completo)
+        plt.savefig(path_hora, dpi=120)
         plt.close()
 
         return path_hora
@@ -396,44 +393,25 @@ class DataExtractor:
 
     # -----------------------------------------------------------------------------------------------------------------
 
-    def media_dia_semana(self):
-        por_dia = (
-            self.registros
-            .values('dia_da_semana')
-            .annotate(total=Count('id'))
-        )
-
-        dias_do_mes = contar_ocorrencias(self.ano, self.mes)
-        print(  )
-
-        medias = {}
-        for item in por_dia:
-            dia_en = item['dia_da_semana']
-            total = item['total']
-            # dia_pt = TRANSLATOR.get(dia_en, 'Desconhecido')
-            ocorrencias = dias_do_mes.get(dia_en, 0)
-            media = round(total / ocorrencias, 2) if ocorrencias else 0
-            media = media 
-            medias[dia_en] = media
-
-        valores_media_semana = [medias.get(d, 0) for d in DIAS_ORDENADOS]
-
-        return valores_media_semana
-
-    # -----------------------------------------------------------------------------------------------------------------
 
     def gerar_grafico_semana(self, valores_media_semana):
+        import matplotlib.pyplot as plt
+
+        dias = DIAS_ORDENADOS
+        valores = valores_media_semana
+
         plt.figure(figsize=(10, 5))
-        plt.bar(DIAS_ORDENADOS, valores_media_semana)
-        plt.title("Média de acessos por dia da semana")
-        plt.xlabel("Dia da semana")
-        plt.ylabel("Média de acessos")
+        plt.bar(dias, valores, color='#99ccff', edgecolor='#004080', width=0.6)
+
+        plt.title("Média de acessos por dia da semana", fontsize=14, fontweight='bold', color='#003366')
+        plt.xlabel("Dia da semana", fontsize=12)
+        plt.ylabel("Média de acessos", fontsize=12)
         plt.xticks(rotation=45)
-        plt.grid(axis='y', linestyle='--', alpha=0.5)
+        plt.grid(axis='y', linestyle='--', alpha=0.4)
         plt.tight_layout()
-        path_dia = os.path.join(self.output_dir, f"graf_media_dia_semana_{self.mes}_{self.ano}.png")
-        caminho_completo = os.path.join(self.output_dir, path_dia)
-        plt.savefig(caminho_completo)
+
+        path_dia = os.path.join(self.output_dir, f"grafico_media_dia_semana_{self.mes}_{self.ano}.png")
+        plt.savefig(path_dia, dpi=120)
         plt.close()
 
         return path_dia
@@ -458,10 +436,6 @@ class DataExtractor:
     # ----------------------------------------------------------------------------------------------------------------------
 
     def mostrar_dados_gerais(self):
-        media_semana = self.media_dia_semana()
-        media_horas = self.calcular_media_por_hora()
-
-
         return f''' Dados gerais: {self.calcular_totais()},
         User(s) mais Assíduo(s): {self.aluno_mais_frequente()},
         Curso com mais visitantes: {self.curso_mais_assiduo()},
