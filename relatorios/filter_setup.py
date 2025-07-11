@@ -351,7 +351,7 @@ class DataExtractor:
         for entrada in acesso_por_hora:
             hora = entrada['hora']
             total = entrada['total'] 
-            medias_hora[hora] = round(total / dias_com_acesso, 4) if dias_com_acesso else 0
+            medias_hora[hora] = round(total / dias_com_acesso, 2) if dias_com_acesso else 0
         return medias_hora
 
     # --------------------------------------------------------------------------------------------------------

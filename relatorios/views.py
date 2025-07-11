@@ -29,6 +29,7 @@ def dashboard_view(request):
     ano_selecionado = request.GET.get('ano')
     mes_selecionado = request.GET.get('mes')
 
+
     dados_gerais = {}
     usuario_assiduo = []
     curso_frequente = {}
@@ -40,6 +41,7 @@ def dashboard_view(request):
     grafico_semana = ''
     grafico_hora_url = None
     grafico_semana_url = None
+    valores_ordenados = []
 
     queryset = {'queryset': [], 'ano': ano_selecionado, 'mes': mes_selecionado}
     

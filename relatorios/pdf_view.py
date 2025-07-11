@@ -24,6 +24,18 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 
+from reportlab.pdfgen import canvas
+from reportlab.platypus import BaseDocTemplate
+
+
+# Definir o título na aba do navegador para o pdf
+class MyDocTemplate(SimpleDocTemplate):
+    def build(self, flowables, canvasmaker=canvas.Canvas):
+        self.canv = canvasmaker(self.filename)
+        self.canv.setTitle("Relatório de Acessos — UFBA")
+        return super().build(flowables, canvasmaker=lambda filename, **kwargs: self.canv)
+
+
 def gerar_pdf(request):
     ano_selecionado = request.GET.get('ano')
     mes_selecionado = request.GET.get('mes')
@@ -160,6 +172,20 @@ def gerar_pdf(request):
     # Rodapé com data
     data_atual = datetime.today().strftime("Camaçari, %d de %B de %Y.")
     elements.append(Paragraph(data_atual, style_normal))
+
+
+    doc = MyDocTemplate(buffer, pagesize=A4,
+                        rightMargin=2*cm, leftMargin=2*cm,
+                        topMargin=2*cm, bottomMargin=2*cm)
+
+    # Metadados
+    doc.title = "Relatório de Acessos"
+    doc.author = "Biblioteca Valterlinda Queiroz - UFBA"
+    doc.subject = "Relatório estatístico de acessos à biblioteca"
+    doc.creator = "Sistema de Relatórios UFBA"
+
+
+
 
     doc.build(elements)
     buffer.seek(0)

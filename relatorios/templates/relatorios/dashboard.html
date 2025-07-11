@@ -39,7 +39,7 @@
             <h2>Registros:</h2>
             <ul>
                 {% for registro in registros %}
-                    <li>{{ registro.nome_completo }} – {{ registro.curso }} - {{ registro.data_acesso|date:"d \\d\\e F \\d\\e Y" }} </li>
+                    <li>{{ registro.nome_completo }}   –-   {{ registro.curso }}   --   {{ registro.data_acesso|date:"d \\d\\e F \\d\\e Y" }} </li>
                 {% empty %}
                     <li>Nenhum registro encontrado.</li>
                 {% endfor %}
@@ -61,7 +61,7 @@
             <h3>👥 Usuário(s) mais assíduo(s)</h3>
             <ul>
                 {% for usuario in usuario_assiduo %}
-                    <li>{{ usuario.nome_completo }} — {{ usuario.curso }} - {{ usuario.matricula }} {{ usuario.total }} acesso(s)</li>
+                    <li>{{ usuario.nome_completo }}  —- Curso:  {{ usuario.curso }}   -- Matrícula:   {{ usuario.matricula }}  --  Número de acessos: {{ usuario.total }} acesso(s)</li>
                 {% endfor %}
             </ul>
         </section>
@@ -102,7 +102,7 @@
         <section>
             <h3>📈 Total de acessos por dia da semana</h3>
             <ul>
-                 {% for dia, valor in total_dia_semana_ordenado %}
+                 {% for dia, valor in total_dias_semanas %}
                     <li>{{ dia }}: {{ valor }}</li>
                 {% endfor %}
             </ul>

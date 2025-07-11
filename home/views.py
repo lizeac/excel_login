@@ -48,18 +48,18 @@ def login_view(request):
         nome_completo = request.POST.get('nome_completo')
         servico = request.POST.get('servico')
         curso = request.POST.get('curso')
+        visitante_checkbox = request.POST.get('visitante')
 
         if not matricula or not nome_completo or not servico:
             return HttpResponse("Todos os campos são obrigatórios. Volte e preencha todos os campos.")
         
-        if not request.POST.get('visitante'):
-            visitante = 'Usuário UFBA'
+        if visitante_checkbox == 'on':
+            if not cpf.validate(matricula):
+                return HttpResponse("O CPF digitado é inválido para visitantes.")
+            visitante = 'Visitante'
         else:
-            if cpf.validate(matricula):
-                visitante = 'Visitante'
-            else:
-                return HttpResponse("O CPF digitado é inválido. Retorne e corrija as informações digitadas.")
-
+            visitante = 'Usuário UFBA'
+        
         if visitante == 'Usuário UFBA' and not check_mat(matricula):
             return HttpResponse("A matrícula é inválida. Volte e digite um valor válido.")
 
